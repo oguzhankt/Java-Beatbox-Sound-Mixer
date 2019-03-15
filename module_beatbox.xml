@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_beatbox" default="compile.module.beatbox">
+  <dirname property="module.beatbox.basedir" file="${ant.file.module_beatbox}"/>
+  
+  <property name="module.jdk.home.beatbox" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.beatbox" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.beatbox" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.beatbox" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="beatbox.output.dir" value="${module.beatbox.basedir}/out/production/BeatBox"/>
+  <property name="beatbox.testoutput.dir" value="${module.beatbox.basedir}/out/test/BeatBox"/>
+  
+  <path id="beatbox.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="beatbox.module.production.classpath">
+    <path refid="${module.jdk.classpath.beatbox}"/>
+  </path>
+  
+  <path id="beatbox.runtime.production.module.classpath">
+    <pathelement location="${beatbox.output.dir}"/>
+  </path>
+  
+  <path id="beatbox.module.classpath">
+    <path refid="${module.jdk.classpath.beatbox}"/>
+    <pathelement location="${beatbox.output.dir}"/>
+  </path>
+  
+  <path id="beatbox.runtime.module.classpath">
+    <pathelement location="${beatbox.testoutput.dir}"/>
+    <pathelement location="${beatbox.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.beatbox">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.beatbox">
+    <patternset refid="excluded.from.module.beatbox"/>
+  </patternset>
+  
+  <path id="beatbox.module.sourcepath">
+    <dirset dir="${module.beatbox.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.beatbox" depends="compile.module.beatbox.production,compile.module.beatbox.tests" description="Compile module BeatBox"/>
+  
+  <target name="compile.module.beatbox.production" depends="register.custom.compilers" description="Compile module BeatBox; production classes">
+    <mkdir dir="${beatbox.output.dir}"/>
+    <javac2 destdir="${beatbox.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.beatbox}/javac">
+      <compilerarg line="${compiler.args.beatbox}"/>
+      <bootclasspath refid="beatbox.module.bootclasspath"/>
+      <classpath refid="beatbox.module.production.classpath"/>
+      <src refid="beatbox.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.beatbox"/>
+    </javac2>
+    
+    <copy todir="${beatbox.output.dir}">
+      <fileset dir="${module.beatbox.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.beatbox.tests" depends="register.custom.compilers,compile.module.beatbox.production" description="compile module BeatBox; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.beatbox" description="cleanup module">
+    <delete dir="${beatbox.output.dir}"/>
+    <delete dir="${beatbox.testoutput.dir}"/>
+  </target>
+</project>
